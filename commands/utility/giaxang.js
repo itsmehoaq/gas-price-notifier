@@ -1,17 +1,18 @@
 const fs = require("node:fs");
 const path = require("node:path");
-const {SlashCommandBuilder} = require('discord.js');
+const { SlashCommandBuilder } = require("discord.js");
 
-const jsonPricesPath = path.resolve(process.cwd(), "prices.json")
+const pricesDataPath = path.resolve(process.cwd(), "prices.txt");
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('giaxang')
-        .setDescription('Lấy thông tin giá xăng hiện tại')
+        .setName("giaxang")
+        .setDescription("Lấy thông tin giá xăng hiện tại")
     ,
     async execute(interaction) {
         try {
-            const currentPrices = JSON.parse(fs.readFileSync(jsonPricesPath));
+            const currentPrices = fs.readFileSync(pricesDataPath, "utf8");
+            const [current92Price, current95Price] = currentPrices.split(",").map((value) => Number(value));
 
             interaction.reply({
                 content: "**Giá xăng trong nước hiện tại:**",
@@ -22,18 +23,18 @@ module.exports = {
                         "fields": [
                             {
                                 "name": "E5RON92",
-                                "value": `${currentPrices["92"].toLocaleString("vi-VN")} đồng/lít`,
+                                "value": `${current92Price.toLocaleString("vi-VN")} đồng/lít`,
                             },
                             {
                                 "name": "RON95",
-                                "value": `${currentPrices["92"].toLocaleString("vi-VN")} đồng/lít`,
+                                "value": `${current95Price.toLocaleString("vi-VN")} đồng/lít`,
                             }
                         ]
                     }
                 ]
             });
         } catch (err) {
-            console.error(err)
+            console.error(err);
         }
     },
 };
